@@ -12,6 +12,7 @@ class OrderStatusUpdatedListener implements ShouldQueue
 {
     public function handle(OrderStatusUpdated $event)
     {
+        $ecommerceUrl = env('ECOMMERCE_URL');
         // Build the notification card JSON object
         $notificationCard = [
             "@type" => "MessageCard",
@@ -25,7 +26,7 @@ class OrderStatusUpdatedListener implements ShouldQueue
                     "targets" => [
                         [
                             "os" => "default",
-                            "uri" => "https://example.com/orders/{$event->orderUuid}",
+                            "uri" => $ecommerceUrl.$event->orderUuid,
                         ],
                     ],
                 ],
@@ -34,7 +35,8 @@ class OrderStatusUpdatedListener implements ShouldQueue
 
         // Submit the notification card to the webhook endpoint
         $client = new Client();
-        $response = $client->post('https://example.com/webhook', [
+        $webHookUrl = env('WEBHOOK_ENDPOINT');
+        $response = $client->post($webHookUrl, [
             'json' => $notificationCard,
         ]);
 
